@@ -1,7 +1,7 @@
 import requests
 import json
-from app.config import get_token
-from app import config
+from wechat.config import get_token
+from wechat import config
 
 class kefu:
     def send_text(self, user, content):

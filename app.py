@@ -3,7 +3,7 @@ import time
 from xml.etree import ElementTree
 from flask import Flask, request, make_response, jsonify
 import threading
-import app as ult
+import wechat as ult
 from flask_cors import CORS
 
 

@@ -1,7 +1,7 @@
-from app import func
-from app import news
+from wechat import func
+from wechat import news
 import time
-from app import config
+from wechat import config
 
 
 wx_token=config.wx_token

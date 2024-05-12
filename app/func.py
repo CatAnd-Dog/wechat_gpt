@@ -1,6 +1,6 @@
 import requests
 import json
-from .config import headers,get_token
+from app.config import headers,get_token
 
 # 这个是管理用户标签，用来限制用户可以使用的功能
 

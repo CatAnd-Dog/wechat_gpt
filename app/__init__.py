@@ -1,7 +1,7 @@
-from . import func
-from . import news
+from app import func
+from app import news
 import time
-from . import config
+from app import config
 
 
 wx_token=config.wx_token
@@ -17,7 +17,7 @@ class clt():
         
 
     def send_text(self,user,msg):
-        tag=self.func.usertag(user)['tagid_list']  # 权限控制部分
+        # tag=self.func.usertag(user)['tagid_list']  # 权限控制部分
         reply="你好，请联系作者"
         if msg.startswith('gpt'):
             parts  = msg.split(' ', 1)
@@ -37,10 +37,10 @@ class clt():
             time.sleep(10)
 
     def send_muban(self, template_id,user, urlred,content):
-        # self.muban.sendmuban(template_id, user, urlred, content)
-        tag=self.func.usertag(user)['tagid_list']
-        if 109 in tag:
-            self.muban.sendmuban(template_id, user, urlred, content)
-            return '发送成功'
-        return '无权限'
+        self.muban.sendmuban(template_id, user, urlred, content)
+        # tag=self.func.usertag(user)['tagid_list']
+        # if 109 in tag:
+        #     self.muban.sendmuban(template_id, user, urlred, content)
+        #     return '发送成功'
+        # return '无权限'
 

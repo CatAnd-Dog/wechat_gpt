@@ -6,3 +6,9 @@ services:
     container_name: opaochat
     ports:
       - "34568:34568"
+    # environment:
+    #   WX_TOKEN: 
+    #   APPID: 
+    #   APPSECRET: 
+    #   CHAT_URL: 
+    #   APIKEY: 

@@ -5,6 +5,9 @@ from wechat import config
 
 
 wx_token=config.wx_token
+defalut_model=config.default_model
+default_reply=config.default_reply
+
 
 # 组合功能类
 
@@ -23,7 +26,7 @@ class clt():
             parts  = msg.split(' ', 1)
             reply=self.chat_msg.chat_gpt(parts[1],parts[0])
         else:
-            reply=self.chat_msg.chat_gpt(msg,'gpt-3.5-turbo')
+            reply=self.chat_msg.chat_gpt(msg,defalut_model)
         # msg以gpt开头
         # if 100 in tag and msg.startswith('gpt4'):
         #     reply=self.getreply(msg,'chat-gpt-4')

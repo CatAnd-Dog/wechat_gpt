@@ -12,6 +12,8 @@ CORS(app)
 
 clt=ult.clt()
 wx_token = ult.wx_token
+default_reply = ult.default_reply
+
 
 @app.route('/', methods=['GET'])
 def index():
@@ -48,7 +50,7 @@ def wechat():
             cont=msg["Content"]
             thread = threading.Thread(target=clt.send_text, args=(user, cont))
             thread.start()
-            return make_response(build_text_response(msg, "正在获取回复内容，请耐心等待，请勿重复发送"))
+            return make_response(build_text_response(msg, default_reply))
         return jsonify({'code': 200, 'data': 'success'})
 
 

@@ -4,11 +4,16 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+# 基础配置
 wx_token=os.getenv('WX_TOKEN',"")
 appid=os.getenv('APPID',"")
 appsecret=os.getenv('APPSECRET',"")
 chat_url=os.getenv('CHAT_URL',"")
 chat_apikey=os.getenv('APIKEY',"")
+
+# 默认模型和回复
+default_model=os.getenv('DEFAULT_MODEL',"gpt-3.5-turbo")
+default_reply=os.getenv('DEFAULT_REPLY',"正在获取回复内容，请耐心等待，请勿重复发送。")
 
 
 

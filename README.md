@@ -28,12 +28,10 @@
 git clone https://github.com/CatAnd-Dog/wechat_gpt.git   
 
 cd  wechat_gpt
-
-copy .env.example .env
 ```
 
-**然后自行修改env环境变量的值**   
-或者也可以在docker compose指定环境变量
+**然后自行修改docker compose环境变量的值**   
+或者也可以新建env文件，在env指定环境变量
 ```
 docker compose up -d
 ```

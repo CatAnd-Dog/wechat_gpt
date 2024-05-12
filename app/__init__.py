@@ -1,7 +1,7 @@
-import func
-import news
+from . import func
+from . import news
 import time
-import config
+from . import config
 
 
 wx_token=config.wx_token

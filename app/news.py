@@ -1,7 +1,7 @@
 import requests
 import json
-from config import get_token
-import config
+from .config import get_token
+from . import config
 
 class kefu:
     def send_text(self, user, content):

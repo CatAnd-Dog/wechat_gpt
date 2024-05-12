@@ -13,7 +13,12 @@ CORS(app)
 clt=ult.clt()
 wx_token = ult.wx_token
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/', methods=['GET'])
+def index():
+    return jsonify({'code': 200, 'data': 'success'})
+
+
+@app.route('/wechat', methods=['GET', 'POST'])
 def wechat():
     # 微信服务器会发送两种类型的请求，一种是GET请求，一种是POST请求
     # GET请求用于验证服务器地址的有效性

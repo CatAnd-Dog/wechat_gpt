@@ -16,8 +16,6 @@ COPY . .
 # 暴露应用运行时的端口
 EXPOSE 34568
 
-# 定义环境变量
-ENV FLASK_APP=app.py
 
 # 设置容器启动时执行的命令
-CMD ["python", "app.py"]
+CMD ["python", "./app.py"]

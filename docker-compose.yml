@@ -6,8 +6,9 @@ services:
     container_name: opaochat
     ports:
       - "34568:34568"
-    # volumes:
-    #   - ./.env:/app/.env
+    volumes:
+      # - ./.env:/app/.env
+      - ./data:/app/data
     environment:
       WX_TOKEN: 
       APPID: 

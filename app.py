@@ -1,4 +1,5 @@
 import hashlib
+import json
 import time
 from xml.etree import ElementTree
 from flask import Flask, request, make_response, jsonify,render_template_string
@@ -66,10 +67,15 @@ def sendmuban():
     urlser=urlred+'/mbpage/'+str(pageurl)
     content = data['content']
     # 写入数据库
-    res1=dbdata_clt.insert_data([str(content),pageurl])
+    if isinstance(content, str):
+        content_data = json.loads(content)
+    values = [info['value'] for key, info in content_data.items()]
+    result = "\n".join(values)
+    res1=dbdata_clt.insert_data([str(result),pageurl])
     # 发送模板消息
-    res2 = clt.send_muban(template_id, user, urlser, content)
-    return jsonify({'code': 200, 'data': res1+res2})
+    res = clt.send_muban(template_id, user, urlser, content)
+    print(res1)
+    return jsonify({'code': 200, 'data': res})
 
 # 这是模板详情页
 @app.route('/mbpage/<id>', methods=['GET'])

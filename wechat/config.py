@@ -17,6 +17,10 @@ default_reply=os.getenv('DEFAULT_REPLY',"正在获取回复内容，请耐心等
 
 
 
+# 数据库配置
+db_host=os.getenv('DB_HOST',"")
+
+
 headers = {'Content-Type': 'application/json'}  # 明确设置请求头
 
 import requests

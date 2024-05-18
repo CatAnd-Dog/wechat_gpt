@@ -1,0 +1,10 @@
+{
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "driver": "SQLite",
+            "name": "dddd",
+            "database": "${workspaceFolder:wechat_gpt}/data/wechat.db"
+        }
+    ]
+}

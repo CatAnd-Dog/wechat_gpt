@@ -1,7 +1,7 @@
 import hashlib
 import time
 from xml.etree import ElementTree
-from flask import Flask, request, make_response, jsonify
+from flask import Flask, request, make_response, jsonify,render_template_string
 import threading
 import wechat as ult
 from flask_cors import CORS
@@ -11,6 +11,7 @@ app = Flask(__name__)
 CORS(app)
 
 clt=ult.clt()
+dbdata_clt=ult.dbdata_clt()
 wx_token = ult.wx_token
 default_reply = ult.default_reply
 
@@ -61,10 +62,25 @@ def sendmuban():
     template_id = data['template_id']
     user = data['user']
     urlred = data['urlred']
+    pageurl=int(time.time())
+    urlser=urlred+'/mbpage/'+str(pageurl)
     content = data['content']
-    res = clt.send_muban(template_id, user, urlred, content)
-    return jsonify({'code': 200, 'data': res})
+    # 写入数据库
+    res1=dbdata_clt.insert_data([str(content),pageurl])
+    # 发送模板消息
+    res2 = clt.send_muban(template_id, user, urlser, content)
+    return jsonify({'code': 200, 'data': res1+res2})
 
+# 这是模板详情页
+@app.route('/mbpage/<id>', methods=['GET'])
+def muban_content(id):
+    # 查询数据库
+    content=dbdata_clt.get_data([int(id)])
+    if content:
+        data=content[1]
+    else:
+        data="错误，没有内容"
+    return render_template_string(data)
 
 
 # 验证服务器地址的有效性

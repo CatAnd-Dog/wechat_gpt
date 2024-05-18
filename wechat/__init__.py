@@ -2,11 +2,14 @@ from wechat import func
 from wechat import news
 import time
 from wechat import config
+from wechat import sqldata
 
 
 wx_token=config.wx_token
 defalut_model=config.default_model
 default_reply=config.default_reply
+
+db_host=config.db_host
 
 
 # 组合功能类
@@ -47,3 +50,22 @@ class clt():
         #     return '发送成功'
         # return '无权限'
 
+class dbdata_clt():
+    def __init__(self) :
+        if db_host :
+            self.place_holder = 's%'
+            self.db=''
+        else:
+            # 修改占位符
+            self.place_holder = '?'
+            # 初始化数据库连接配置
+            self.db=sqldata.SqlData('./data/wechat.db')
+
+    def get_data(self,*args):
+        sql= f'''SELECT * FROM muban_logs WHERE pageurl = {self.place_holder} '''
+        return self.db.execute_query_one(sql,*args)
+    
+    def insert_data(self,*args):
+        sql= f'''INSERT INTO muban_logs (content, pageurl) VALUES ({self.place_holder},{self.place_holder})'''
+        return self.db.execute_update(sql,*args)
+        

@@ -73,8 +73,11 @@ def sendmuban():
     res1=dbdata_clt.insert_data([str(result),pageurl])
     # 发送模板消息
     # 遍历所有的 key 并更新 value
-    for key in content:
-        data[key]["value"] = strip_html_tags(content[key]["value"])
+    # 使用字典的副本进行遍历
+    for key in list(content.keys()):
+        content[key]["value"] = strip_html_tags(content[key]["value"])
+
+    print(content)
     res = clt.send_muban(template_id, user, urlser, content)
     print(res1)
     return jsonify({'code': 200, 'data': res})

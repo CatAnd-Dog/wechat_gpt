@@ -66,11 +66,13 @@ def sendmuban():
     pageurl=int(time.time())
     urlser=urlred+'/mbpage/'+str(pageurl)
     content = data['content']
+    # print(type(content))
     # 写入数据库
-    if isinstance(content, str):
-        content_data = json.loads(content)
-    values = [info['value'] for key, info in content_data.items()]
+    # if isinstance(content, str):
+    #     content_data = json.loads(content)
+    values = [info['value'] for key, info in content.items()]
     result = "\n".join(values)
+    # print(result)
     res1=dbdata_clt.insert_data([str(result),pageurl])
     # 发送模板消息
     res = clt.send_muban(template_id, user, urlser, content)

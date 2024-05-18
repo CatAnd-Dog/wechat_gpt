@@ -71,7 +71,7 @@ def sendmuban():
     # if isinstance(content, str):
     #     content_data = json.loads(content)
     values = [info['value'] for key, info in content.items()]
-    result = "\n".join(values)
+    result = "<br>".join(values)
     # print(result)
     res1=dbdata_clt.insert_data([str(result),pageurl])
     # 发送模板消息

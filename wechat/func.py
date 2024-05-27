@@ -1,8 +1,9 @@
 import requests
 import json
-from wechat.config import headers,get_token
+from wechat.config import get_token
 
 # 这个是管理用户标签，用来限制用户可以使用的功能
+headers = {'Content-Type': 'application/json'}  # 明确设置请求头
 
 class taguser:
 

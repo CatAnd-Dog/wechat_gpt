@@ -2,3 +2,4 @@ Flask
 requests
 flask-cors
 python-dotenv
+pycryptodome

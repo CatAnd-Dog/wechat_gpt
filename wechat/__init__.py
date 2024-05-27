@@ -6,6 +6,8 @@ from wechat import sqldata
 
 
 wx_token=config.wx_token
+appid=config.appid
+EncodingAESKey=config.EncodingAESKey
 defalut_model=config.default_model
 default_reply=config.default_reply
 
@@ -22,7 +24,7 @@ class clt():
         self.chat_msg = news.chat_msg()
         
 
-    def send_text(self,user,msg):
+    def send_text(self,user,msg,agentid):
         # tag=self.func.usertag(user)['tagid_list']  # 权限控制部分
         reply="你好，请联系作者"
         if msg.startswith('gpt'):
@@ -37,9 +39,9 @@ class clt():
         #     reply=self.getreply(msg,'gpt-3.5-turbo-1106')
         
         # 如果回复长度超过 500 字符，分批发送
-        for start in range(0, len(reply), 500):
+        for start in range(0, len(reply), 1500):
             # 截取从 start 到 start+500 的字符，发送
-            self.news.send_text(user, reply[start:start + 500])
+            self.news.send_text(user, reply[start:start + 1500],agentid)
             time.sleep(10)
 
     def send_muban(self, template_id,user, urlred,content):

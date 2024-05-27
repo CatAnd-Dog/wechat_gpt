@@ -4,14 +4,17 @@ from wechat.config import get_token
 from wechat import config
 
 class kefu:
-    def send_text(self, user, content):
+    def send_text(self, user, content,agentid):
         token=get_token()
-        url = "https://api.weixin.qq.com/cgi-bin/message/custom/send?access_token={}".format(token)
+        url = config.base_url+config.url_join['message_send'].format(token)
         headers = {"Content-Type": "application/json; charset=utf-8", "Connection": "keep-alive"}
         data = {
-            "touser": user,
-            "msgtype": "text",
-            "text":{ "content": content}
+                "touser" : user,
+                "msgtype" : "text",
+                "agentid" : agentid,
+                "text" : {
+                    "content" : content
+                },
                 }
         data=json.dumps(data, ensure_ascii=False).encode('utf8')
         res = requests.post(url=url, data=data, headers=headers)
@@ -21,7 +24,7 @@ class  muban:
 
     def sendmuban(self, template_id,user, urlred,content):
         token=get_token()
-        url = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token={}".format(token)
+        url = config.base_url+config.url_join['message_send'].format(token)
         headers = {"Content-Type": "application/json; charset=utf-8", "Connection": "keep-alive"}
         data = {
             "touser": user,
@@ -62,7 +65,6 @@ class chat_msg:
             print(e)
             rep='gpt请求失败'
         return rep
-
 
 
 

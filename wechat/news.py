@@ -2,6 +2,15 @@ import requests
 import json
 from wechat.config import get_token
 from wechat import config
+import logging
+
+logging.basicConfig(level=logging.DEBUG, 
+                    format='%(asctime)s %(levelname)s: %(message)s', 
+                    datefmt='%Y-%m-%d %H:%M:%S')
+
+# 创建一个日志器
+logger = logging.getLogger(__name__)
+
 
 class kefu:
     def send_text(self, user, content,agentid):
@@ -63,6 +72,7 @@ class chat_msg:
             rep=req.json()['choices'][0]['message']['content']
         except Exception as e:
             print(e)
+            logger.debug(f'''gpt请求失败，返回内容：{e}''')
             rep='gpt请求失败'
         return rep
 

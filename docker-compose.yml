@@ -1,9 +1,9 @@
 version: '3.8'
 services:
-  opaochat:
-    image: oneperfect/opaochat:latest
+  opaochatplus:
+    image: oneperfect/opaochatplus:latest
     restart: always
-    container_name: opaochat
+    container_name: opaochatplus
     ports:
       - "34568:34568"
     volumes:

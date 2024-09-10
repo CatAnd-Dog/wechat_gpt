@@ -24,12 +24,15 @@ class clt():
 
     def send_text(self,user,msg):
         tag=self.func.usertag(user)['tagid_list']  # 权限控制部分
-        reply="你好，请联系作者"
-        if 101 in tag and msg.startswith('gpt'):
-            parts  = msg.split(' ', 1)
-            reply=self.chat_msg.chat_gpt(parts[1],parts[0])
+        reply="您好，请联系作者"
+        if 101 in tag :
+            if msg.startswith('gpt')
+                parts  = msg.split(' ', 1)
+                reply=self.chat_msg.chat_gpt(parts[1],parts[0])
+            else:
+                reply=self.chat_msg.chat_gpt(msg,defalut_model)
         else:
-            reply=self.chat_msg.chat_gpt(msg,defalut_model)
+            reply="您好，您没有权限，请联系oneperfect"
 
         # 如果回复长度超过 500 字符，分批发送
         for start in range(0, len(reply), 500):

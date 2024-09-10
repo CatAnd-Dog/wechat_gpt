@@ -25,7 +25,7 @@ class clt():
     def send_text(self,user,msg):
         tag=self.func.usertag(user)['tagid_list']  # 权限控制部分
         reply="您好，请联系作者"
-        if 101 in tag :
+        if 100 in tag :
             if msg.startswith('gpt'):
                 parts  = msg.split(' ', 1)
                 reply=self.chat_msg.chat_gpt(parts[1],parts[0])

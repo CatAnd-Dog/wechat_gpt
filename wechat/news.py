@@ -66,6 +66,7 @@ class chat_msg:
                 {"role": "user", "content": msg},
             ],
             'max_tokens': 2000,
+          'stream': False,
         }
         req=requests.post(url,headers=headers,json=data,timeout=120)
         try:

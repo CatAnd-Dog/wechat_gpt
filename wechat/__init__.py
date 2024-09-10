@@ -38,7 +38,7 @@ class clt():
             time.sleep(10)
 
     def send_muban(self, template_id,user, urlred,content):
-        self.muban.sendmuban(template_id, user, urlred, content)
+        # self.muban.sendmuban(template_id, user, urlred, content)
         tag=self.func.usertag(user)['tagid_list']
         if 109 in tag:
             self.muban.sendmuban(template_id, user, urlred, content)

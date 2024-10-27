@@ -53,12 +53,13 @@ def wechat():
             cont=msg["Content"]
             if cont=="清除":
                 clt.clean_usermsg(user)
-                return make_response(build_text_response(msg, "清除成功"))
+                return make_response(build_text_response(msg, "记忆清除成功"))
             else:
                 thread = threading.Thread(target=clt.send_text, args=(user, cont))
                 thread.start()
                 return make_response(build_text_response(msg, default_reply))
         return jsonify({'code': 200, 'data': 'success'})
+
 
 
 # 这是模板消息接口

@@ -62,7 +62,7 @@ class chat_msg:
         data={
             'model':model,
             'messages':msg,
-            'max_tokens': 4000,
+            'max_tokens': 6000,
             'stream': False,
         }
         req=requests.post(url,headers=headers,json=data,timeout=120)

@@ -1,3 +1,3 @@
 .env
 test.py
-/wechat/__pycache__/
+*.pyc

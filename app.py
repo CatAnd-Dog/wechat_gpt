@@ -7,15 +7,17 @@ from flask import Flask, request, make_response, jsonify,render_template_string
 import threading
 import wechat as ult
 from flask_cors import CORS
+from wechat import config   # 从wechat文件夹中导入config.py文件
 
 
 app = Flask(__name__)
 CORS(app)
 
+
 clt=ult.clt()
 dbdata_clt=ult.dbdata_clt()
-wx_token = ult.wx_token
-default_reply = ult.default_reply
+wx_token = config.wx_token
+default_reply = config.default_reply
 
 
 @app.route('/', methods=['GET'])
@@ -41,19 +43,21 @@ def wechat():
         msg = parse_message(xml_data)
         user = msg["FromUserName"]
         msg_type = msg["MsgType"]
-        
         # 这个是菜单点击事件的处理。
         if msg_type == "event" and msg["Event"] == "CLICK":
             if msg["EventKey"] == "yourID":
                 return make_response(build_text_response(msg, user))
             return make_response(build_text_response(msg, "天王盖地虎"))
-        
         # 这是处理用户发送的文本消息的代码。
         if msg_type == "text" :
             cont=msg["Content"]
-            thread = threading.Thread(target=clt.send_text, args=(user, cont))
-            thread.start()
-            return make_response(build_text_response(msg, default_reply))
+            if cont=="清除":
+                clt.clean_usermsg(user)
+                return make_response(build_text_response(msg, "清除成功"))
+            else:
+                thread = threading.Thread(target=clt.send_text, args=(user, cont))
+                thread.start()
+                return make_response(build_text_response(msg, default_reply))
         return jsonify({'code': 200, 'data': 'success'})
 
 
@@ -81,6 +85,7 @@ def sendmuban():
     res = clt.send_muban(template_id, user, urlser, content)
     print(res1)
     return jsonify({'code': 200, 'data': res})
+
 
 # 这是模板详情页
 @app.route('/mbpage/<id>', methods=['GET'])

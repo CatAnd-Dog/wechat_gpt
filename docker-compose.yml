@@ -7,11 +7,11 @@ services:
     ports:
       - "34568:34568"
     volumes:
-      # - ./.env:/app/.env
+      - ./.env:/app/.env
       - ./data:/app/data
-    environment:
-      WX_TOKEN: 
-      APPID: 
-      APPSECRET: 
-      CHAT_URL: 
-      APIKEY: 
+    # environment:
+    #   WX_TOKEN: 
+    #   APPID: 
+    #   APPSECRET: 
+    #   CHAT_URL: 
+    #   APIKEY: 

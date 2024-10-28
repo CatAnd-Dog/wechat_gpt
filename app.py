@@ -77,6 +77,7 @@ def sendmuban():
     res = clt.send_muban(template_id, user, urlser, content)
     return jsonify({'code': 200, 'data': res})
 
+
 # 这是模板详情页
 @app.route('/mbpage/<id>', methods=['GET'])
 def muban_content(id):

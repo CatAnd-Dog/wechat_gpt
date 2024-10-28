@@ -47,7 +47,7 @@ def get_token():
     try:
         req=requests.post(url,json=data)
         token=req.json()['access_token']
-        loger.info("token: %s",token)
+        logger.info("token: %s",token)
         return token
     except Exception as e:
         logger.error("获取token失败: %s",str(e))

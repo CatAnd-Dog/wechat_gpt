@@ -8,6 +8,7 @@ from . import loger
 import time
 from cachetools import TTLCache, cached
 from cachetools.keys import hashkey
+from threading import Lock
 
 # 默认模型
 all_model=config.all_model_list
@@ -32,13 +33,13 @@ def get_access_token():
 
 # 创建一个TTLCache用于存储userid到content列表的映射，容量为1000，过期时间为600秒（10分钟）
 id_content_cache = TTLCache(maxsize=1000, ttl=600)
-
+cache_lock = Lock()
 def add_content_to_id(id_, content):
     """
     添加content到指定id的列表中。
     如果id不存在，则创建新的列表。
     """
-    with id_content_cache.lock:
+    with cache_lock:
         if id_ in id_content_cache:
             id_content_cache[id_].append(content)
         else:
@@ -51,7 +52,7 @@ def get_contents_by_id(id_):
     获取指定id的内容列表。
     如果id不存在，则返回空列表。
     """
-    with id_content_cache.lock:
+    with cache_lock:
         return list(id_content_cache.get(id_, []))
 
 
@@ -68,7 +69,7 @@ class clt():
         self.chat_msg = news.chat_msg()
 
     def deal_msg(self, user, msg):
-        logger.debug("用户消息: %s",parts)
+        logger.debug("用户消息: %s",msg)
         parts  = msg.split(' ', 1)
         if parts[0] in all_model:  # 如果消息以模型名称开头,则使用该模型回复
             message= {'role': 'user', 'content': parts[1]}
@@ -101,6 +102,7 @@ class clt():
             self.news.send_text(user, reply[start:start + 500],token)
             time.sleep(5)
         # 发送完成
+        self.deal_msg2(user,reply[:500])
         self.news.kefu_status(user,'CancelTyping',token)
 
     # 清除用户记忆消息

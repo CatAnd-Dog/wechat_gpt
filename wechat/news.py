@@ -1,7 +1,7 @@
 import requests
 from . import config
 from . import loger
-
+import json 
 
 logger = loger.setup_logger(__name__)
 
@@ -20,7 +20,8 @@ class kefu:
     def kefu_status(self,user,status,token):
         url = 'https://api.weixin.qq.com/cgi-bin/message/custom/typing?access_token={}'.format(token)
         data= { "touser":user, "command":status}
-        res = requests.post(url=url, json=data, headers=headers)
+        data=json.dumps(data, ensure_ascii=False).encode('utf8')
+        res = requests.post(url=url, data=data, headers=headers)
         return res.json()
 
     # 发送文本消息
@@ -31,7 +32,8 @@ class kefu:
             "msgtype": "text",
             "text":{ "content": content}
                 }
-        res = requests.post(url=url, json=data, headers=headers)
+        data=json.dumps(data, ensure_ascii=False).encode('utf8')
+        res = requests.post(url=url, data=data, headers=headers)
         return res.json()
 
 
@@ -66,11 +68,12 @@ class chat_msg:
             'stream': False,
         }
         req=requests.post(url,headers=headers,json=data,timeout=120)
+        logger.debug("gpt请求返回: %s",req.text)
         try:
             rep=req.json()['choices'][0]['message']['content']
         except Exception as e:
             logger.error("gpt请求失败: %s",str(e))
-            rep='gpt请求失败'
+            rep='请求失败'
         return rep
 
 

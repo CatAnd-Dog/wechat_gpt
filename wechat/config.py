@@ -38,7 +38,6 @@ logger.info("db_host: %s",db_host)
 
 
 def get_token():
-    headers = {'Content-Type': 'application/json'}  # 明确设置请求头
     url="https://api.weixin.qq.com/cgi-bin/stable_token"
     data={
         "grant_type":"client_credential",
@@ -46,7 +45,7 @@ def get_token():
         "secret":appsecret
     }
     try:
-        req=requests.post(url,headers,json=data)
+        req=requests.post(url,json=data)
         token=req.json()['access_token']
         loger.info("token: %s",token)
         return token

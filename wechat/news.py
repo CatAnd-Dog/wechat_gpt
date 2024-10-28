@@ -17,7 +17,7 @@ headers = {
 class kefu:
 
     # 发送客服状态
-    def kefu_status(user,status,token):
+    def kefu_status(self,user,status,token):
         url = 'https://api.weixin.qq.com/cgi-bin/message/custom/typing?access_token={}'.format(token)
         data= { "touser":user, "command":status}
         res = requests.post(url=url, json=data, headers=headers)

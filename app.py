@@ -1,18 +1,17 @@
 import hashlib
-import re
-import html
 import time
 from xml.etree import ElementTree
-from flask import Flask, request, make_response, jsonify,render_template_string
+from flask import Flask, request, make_response, jsonify,render_template
 import threading
 import wechat as ult
 from flask_cors import CORS
 from wechat import config   # 从wechat文件夹中导入config.py文件
+from wechat import loger
 
 
 app = Flask(__name__)
 CORS(app)
-
+logger = loger.setup_logger(__name__)
 
 clt=ult.clt()
 dbdata_clt=ult.dbdata_clt()
@@ -74,7 +73,11 @@ def sendmuban():
     pageurl=int(time.time())
     urlser=urlred+'/mbpage/'+str(pageurl)
     content = data['content']
+    # 发送模板消息
     res = clt.send_muban(template_id, user, urlser, content)
+    # 写入数据库,作为字符串写入
+    content=str(content)
+    dbdata_clt.insert_data([content,pageurl])
     return jsonify({'code': 200, 'data': res})
 
 
@@ -87,7 +90,9 @@ def muban_content(id):
         data=content[1]
     else:
         data="错误，没有内容"
-    return render_template_string(data)
+
+    # 渲染模板--------需要美化(todo)
+    return render_template("muban_content.html", content=data)
 
 
 # 验证服务器地址的有效性

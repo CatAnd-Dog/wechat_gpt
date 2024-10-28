@@ -1,9 +1,10 @@
 import sqlite3
 
+# 更新为数据库长连接
 
 class SqlData(object):
     def __init__(self, db_path):
-        self.db_path=db_path
+        self.connection = sqlite3.connect(db_path)
         self.create_table_if_not_exists()
 
     def create_table_if_not_exists(self):
@@ -14,59 +15,52 @@ class SqlData(object):
             pageurl INTEGER,
             UNIQUE(pageurl)
         );
-        CREATE INDEX IF NOT EXISTS idx_pageurl ON muban_logs(pageurl);
         '''
+        create_index_query = '''CREATE INDEX IF NOT EXISTS idx_pageurl ON muban_logs(pageurl);'''
+        cursor = self.connection.cursor()
         try:
-            self.connect()
-            self.cursor.executescript(create_table_query)
+            cursor.execute(create_table_query)
+            cursor.execute(create_index_query)
             self.connection.commit()
         finally:
-            self.close()
-
-    def connect(self):
-        self.connection = sqlite3.connect(self.db_path)
-        self.cursor = self.connection.cursor()
-        
+            cursor.close()  # 明确关闭游标   
 
     # 返回所有查询结果
     def execute_query(self, query,*args):
-        result = ''
+        cursor = self.connection.cursor()
+        result = 'error'
         try:
-            self.connect()
-            self.cursor.execute(query,*args)
-            result = self.cursor.fetchall()
+            cursor.execute(query,*args)
+            result = cursor.fetchall()
         finally:
-            self.close()
+            cursor.close()  # 明确关闭游标   
         return result
     
     # 返回单个查询结果
     def execute_query_one(self, query,*args):
-        result = ''
+        cursor = self.connection.cursor()
+        result = 'error'
         try:
-            self.connect()
-            self.cursor.execute(query,*args)
-            result = self.cursor.fetchone()
+            cursor.execute(query,*args)
+            result = cursor.fetchone()
         finally:
-            self.close()
+            cursor.close()  # 明确关闭游标 
         return result
 
     def execute_update(self, query,*args):
+        cursor = self.connection.cursor()
         result='error'
         try:
-            self.connect()
-            self.cursor.execute(query,*args)
+            cursor.execute(query,*args)
             self.connection.commit()
             result='success'
         finally:
-            self.close()
+            cursor.close()  # 明确关闭游标
         return result
 
+    # 关闭数据库连接
     def close(self):
-        try:
-            self.cursor.close()
-            self.connection.close()
-        except:
-            self.connection.close()
+        self.connection.close()
         
 
 

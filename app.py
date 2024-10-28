@@ -74,21 +74,8 @@ def sendmuban():
     pageurl=int(time.time())
     urlser=urlred+'/mbpage/'+str(pageurl)
     content = data['content']
-    # 写入数据库
-    values = [info['value'] for key, info in content.items()]
-    result = "<br>".join(values)
-    res1=dbdata_clt.insert_data([str(result),pageurl])
-    # 发送模板消息
-    # 遍历所有的 key 并更新 value
-    # 使用字典的副本进行遍历
-    for key in list(content.keys()):
-        content[key]["value"] = strip_html_tags(content[key]["value"])
-
-    print(content)
     res = clt.send_muban(template_id, user, urlser, content)
-    print(res1)
     return jsonify({'code': 200, 'data': res})
-
 
 # 这是模板详情页
 @app.route('/mbpage/<id>', methods=['GET'])
@@ -141,11 +128,6 @@ def build_text_response(msg, content):
     """
     return resp_msg
 
-def strip_html_tags(text):
-    # Unescape HTML entities
-    text = html.unescape(text)
-    # Remove HTML tags using regex
-    return re.sub(r'<.*?>', '', text)
 
 
 if __name__ == '__main__':

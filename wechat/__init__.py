@@ -99,7 +99,7 @@ class clt():
             model=default_model
         # 构造消息
         add_content_to_id(user, [message])
-        contents = get_contents_by_id(user)
+        contents = get_contents_by_id(user)[-7:]
         return contents,model
     
     # 把回复消息存入缓存
@@ -122,21 +122,21 @@ class clt():
             # 调用模型回复
             # 判断是否需要总结
             logger.debug("用户消息数组: %s",msg)
-            if len(msg) > 8:
-                prompt = {'role': 'user', 'content': '请概述我们之前的所有对话内容，以此作为我们接下来对话的提示.'}
-                # 把用户消息先提出来
-                logger.debug("用户消息: %s",msg)
-                user_msg = msg[-1]
-                # 替换为总结提示
-                msg[-1] = prompt
-                reply_s = self.summary(msg)
-                # 获取总结回复
-                reply_message = {"role": "system", "content": reply_s}
-                self.clean_usermsg(user)
-                # 构造用户消息
-                msg = [reply_message, user_msg]
-                # 把用户消息存入缓存
-                self.deal_msg2(user,msg)
+            # if len(msg) > 8:
+            #     prompt = {'role': 'user', 'content': '请概述我们之前的所有对话内容，以此作为我们接下来对话的提示.'}
+            #     # 把用户消息先提出来
+            #     logger.debug("用户消息: %s",msg)
+            #     user_msg = msg[-1]
+            #     # 替换为总结提示
+            #     msg[-1] = prompt
+            #     reply_s = self.summary(msg)
+            #     # 获取总结回复
+            #     reply_message = {"role": "system", "content": reply_s}
+            #     self.clean_usermsg(user)
+            #     # 构造用户消息
+            #     msg = [reply_message, user_msg]
+            #     # 把用户消息存入缓存
+            #     self.deal_msg2(user,msg)
             
             reply=self.chat_msg.chat_gpt(msg,model)
         

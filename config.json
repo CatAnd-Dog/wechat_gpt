@@ -1,0 +1,25 @@
+{
+    "Tags": {
+        "base":[
+            "gpt-4o",
+            "gpt-4o-mini"
+        ], 
+        "vip": [
+            "model-1",
+            "model-2",
+            "model-3"
+        ],
+        "svip": [
+            "model-1",
+            "model-1",
+            "model-1"
+        ],
+        "admin": [
+            "model-1"
+        ],
+        "muban": [
+            "muban"
+        ]
+    }
+
+}

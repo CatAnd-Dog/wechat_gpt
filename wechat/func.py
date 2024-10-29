@@ -26,7 +26,7 @@ class taguser:
         return req.json()
     
     def gettag(self,token):
-        url="https://api.weixin.qq.com/cgi-bin/groups/get?access_token={}".format(token)
+        url="https://api.weixin.qq.com/cgi-bin/tags/get?access_token={}".format(token)
         req=requests.get(url)
         return req.json()
     
@@ -61,9 +61,5 @@ class taguser:
         url="https://api.weixin.qq.com/cgi-bin/user/info?access_token={}&openid={}".format(token,user)
         req = requests.get(url,  headers=headers)
         return req.json()
-
-
-
-
 
 

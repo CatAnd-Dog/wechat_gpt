@@ -11,7 +11,7 @@ from cachetools.keys import hashkey
 from threading import Lock
 
 # 默认模型
-all_model=config.all_model_list
+default_model=config.default_model
 appid=config.appid
 appsecret=config.appsecret
 
@@ -67,16 +67,37 @@ class clt():
         self.muban = news.muban()
         # 聊天功能---调用gpt模型
         self.chat_msg = news.chat_msg()
+        # 初始化标签---用于权限控制
+        self.auth_list = self.init_tag()
+ 
+    # 初始化标签
+    def init_tag(self):
+        token = get_access_token()
+        auth_list={}
+        # 获取标签列表
+        taglist = self.func.gettag(token)['tags']
+        taglist_dic= {tag['name']: tag['id'] for tag in taglist}
+        for tag in config.Tags:
+            # 如果标签不存在则创建
+            if tag not in taglist_dic:
+                req=self.func.creattag(tag, token)
+                auth_list[req['tag']['id']]=config.Tags.get(tag)
+            else:
+                auth_list[taglist_dic.get(tag)]=config.Tags.get(tag)
+        return auth_list
+   
 
     def deal_msg(self, user, msg):
         logger.debug("用户消息: %s",msg)
         parts  = msg.split(' ', 1)
-        if parts[0] in all_model:  # 如果消息以模型名称开头,则使用该模型回复
+
+
+        if parts[0] in []:  # 如果消息以模型名称开头,则使用该模型回复
             message= {'role': 'user', 'content': parts[1]}
             model=parts[0]
         else: # 否则使用默认模型回复，默认模型为 all_model[0]
             message = {'role': 'user', 'content': msg}
-            model=all_model[0]
+            model=default_model
         # 构造消息
         add_content_to_id(user, message)
         # 获取构造后的消息,最多7条
@@ -94,8 +115,17 @@ class clt():
         token = get_access_token()
         # 发送正在输入状态
         self.news.kefu_status(user,'Typing',token)
-        # 调用模型回复
-        reply=self.chat_msg.chat_gpt(msg,model)
+        usertag = self.func.usertag(user,token)['tagid_list']
+        # 查询用户权限
+        auth = [self.auth_list.get(tag) for tag in usertag]
+        auth= sum(auth, [])
+        # 判断用户权限
+        if model not in auth:
+            reply = "您没有权限使用该模型，请联系管理员。"
+        else:
+            # 调用模型回复
+            reply=self.chat_msg.chat_gpt(msg,model)
+        
         # 如果回复长度超过 500 字符，分批发送
         for start in range(0, len(reply), 500):
             # 截取从 start 到 start+500 的字符，发送
@@ -111,13 +141,13 @@ class clt():
 
     # 发送模板消息
     def send_muban(self, template_id,user, urlred,content):
-        # self.muban.sendmuban(template_id, user, urlred, content)
-        tag=self.func.usertag(user)['tagid_list']
-        if 109 in tag:
-            self.muban.sendmuban(template_id, user, urlred, content)
-            return '发送成功'
-        return '无权限'
         token = get_access_token()
+        usertag = self.func.usertag(user,token)['tagid_list']
+        # 查询用户权限
+        auth = [self.auth_list.get(tag) for tag in usertag]
+        auth= sum(auth, [])
+        if 'muban' not in auth:
+            return 'erro'
         self.muban.sendmuban(template_id, user, urlred, content,token)
         logger.debug("template_id: %s, user: %s, urlred: %s, content: %s",template_id, user, urlred, content)
         return 'success'

@@ -121,8 +121,9 @@ class clt():
         else:
             # 调用模型回复
             # 判断是否需要总结
-            if len(msg) > 7:
-                prompt = {'role': 'user', 'content': '请概述我们之前的所有对话内容。并控制在500字以内。'}
+            logger.debug("用户消息数组: %s",msg)
+            if len(msg) > 8:
+                prompt = {'role': 'user', 'content': '请概述我们之前的所有对话内容，以此作为我们接下来对话的提示.'}
                 # 把用户消息先提出来
                 logger.debug("用户消息: %s",msg)
                 user_msg = msg[-1]
@@ -130,12 +131,13 @@ class clt():
                 msg[-1] = prompt
                 reply_s = self.summary(msg)
                 # 获取总结回复
-                reply_message = {"role": "assistant", "content": reply_s}
+                reply_message = {"role": "system", "content": reply_s}
                 self.clean_usermsg(user)
                 # 构造用户消息
-                msg = [prompt,reply_message, user_msg]
+                msg = [reply_message, user_msg]
                 # 把用户消息存入缓存
                 self.deal_msg2(user,msg)
+            
             reply=self.chat_msg.chat_gpt(msg,model)
         
         # 如果回复长度超过 500 字符，分批发送

@@ -57,7 +57,6 @@ def wechat():
                 message,model=clt.deal_msg(user,cont)
                 thread = threading.Thread(target=clt.send_text, args=(user, message, model))
                 thread.start()
-                clt.deal_msg2(user,'好的，我记住了。')
                 return make_response(build_text_response(msg, default_reply))
         return jsonify({'code': 200, 'data': 'success'})
 

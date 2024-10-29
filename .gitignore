@@ -1,3 +1,4 @@
-/.env
-/test.py
-/*.pyc
+.env
+test.py
+wechat/__pycache__/
+.vscode/

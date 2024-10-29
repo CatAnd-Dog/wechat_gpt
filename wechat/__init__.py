@@ -41,9 +41,9 @@ def add_content_to_id(id_, content):
     """
     with cache_lock:
         if id_ in id_content_cache:
-            id_content_cache[id_].append(content)
+            id_content_cache[id_] += content
         else:
-            id_content_cache[id_] = [content]
+            id_content_cache[id_] = content
         # 访问或更新id会刷新其过期时间
         return list(id_content_cache[id_])
 
@@ -87,11 +87,10 @@ class clt():
         return auth_list
    
 
+    # 把用户消息存入缓存
     def deal_msg(self, user, msg):
         logger.debug("用户消息: %s",msg)
         parts  = msg.split(' ', 1)
-
-
         if parts[0] in []:  # 如果消息以模型名称开头,则使用该模型回复
             message= {'role': 'user', 'content': parts[1]}
             model=parts[0]
@@ -99,15 +98,23 @@ class clt():
             message = {'role': 'user', 'content': msg}
             model=default_model
         # 构造消息
-        add_content_to_id(user, message)
+        add_content_to_id(user, [message])
+        contents = get_contents_by_id(user)
         # 获取构造后的消息,最多7条
-        contents = get_contents_by_id(user)[-7:]
+        if len(contents) > 7:
+            prompt = {'role': 'user', 'content': '请概述我们之前的所有对话内容。并控制在500字以内。'}
+            contents[-1] = prompt
+            reply = self.summary(contents)
+            reply_message = {"role": "assistant", "content": reply}
+            self.clean_usermsg(user)
+            add_content_to_id(user, [prompt,reply_message, message])
+            
         return contents,model
     
+    # 把回复消息存入缓存
     def deal_msg2(self, user, msg):
-        # 构造回复消息,为了避免回复过长，只取前500字符
         reply_message = {"role": "assistant", "content": msg}
-        add_content_to_id(user, reply_message)
+        add_content_to_id(user, [reply_message])
  
 
     # 发送文本消息
@@ -139,6 +146,11 @@ class clt():
     def clean_usermsg(self,user):
         id_content_cache.pop(user, None)
 
+    # 总结聊天记录，防止消息过多
+    def summary(self,prompt):
+        reply=self.chat_msg.chat_gpt(prompt,default_model)
+        return reply
+
     # 发送模板消息
     def send_muban(self, template_id,user, urlred,content):
         token = get_access_token()
@@ -152,6 +164,17 @@ class clt():
         logger.debug("template_id: %s, user: %s, urlred: %s, content: %s",template_id, user, urlred, content)
         return 'success'
 
+    # 管理员认证---调用这个函数判断用户是否为管理员
+    def is_admin(self,user):
+        token = get_access_token()
+        usertag = self.func.usertag(user,token)['tagid_list']
+        # 查询用户权限
+        auth = [self.auth_list.get(tag) for tag in usertag]
+        auth= sum(auth, [])
+        if 'admin' in auth:
+            return True
+        else:
+            return False
 
 # 数据库操作类
 class dbdata_clt():

@@ -1,6 +1,10 @@
 name: Docker Image CI
 
 on:
+  push:
+      branches:
+        - main
+        - opaoplus
   workflow_dispatch:
 
 jobs:
@@ -16,7 +20,13 @@ jobs:
       
       - name: Build and push Docker image
         run: |
-          docker build . --file Dockerfile --tag ${{ secrets.DOCKER_USERNAME }}/opaochat:$(date +%Y%m%d)
-          docker push ${{ secrets.DOCKER_USERNAME }}/opaochat:$(date +%Y%m%d)
-          docker tag ${{ secrets.DOCKER_USERNAME }}/opaochat:$(date +%Y%m%d) ${{ secrets.DOCKER_USERNAME }}/opaochat:latest
-          docker push ${{ secrets.DOCKER_USERNAME }}/opaochat:latest
+          BRANCH_NAME=${GITHUB_REF#refs/heads/}
+          if [ "$BRANCH_NAME" == "main" ]; then
+            docker build . --file Dockerfile --tag ${{ secrets.DOCKER_USERNAME }}/opaochat:$(date +%Y%m%d)
+            docker push ${{ secrets.DOCKER_USERNAME }}/opaochat:$(date +%Y%m%d)
+            docker tag ${{ secrets.DOCKER_USERNAME }}/opaochat:$(date +%Y%m%d) ${{ secrets.DOCKER_USERNAME }}/opaochat:latest
+            docker push ${{ secrets.DOCKER_USERNAME }}/opaochat:latest
+          else
+            docker build . --file Dockerfile --tag ${{ secrets.DOCKER_USERNAME }}/opaochat:$BRANCH_NAME
+            docker push ${{ secrets.DOCKER_USERNAME }}/opaochat:$BRANCH_NAME
+          fi

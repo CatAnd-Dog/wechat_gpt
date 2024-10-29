@@ -124,6 +124,7 @@ class clt():
             if len(msg) > 7:
                 prompt = {'role': 'user', 'content': '请概述我们之前的所有对话内容。并控制在500字以内。'}
                 # 把用户消息先提出来
+                logger.debug("用户消息: %s",msg)
                 user_msg = msg[-1]
                 # 替换为总结提示
                 msg[-1] = prompt

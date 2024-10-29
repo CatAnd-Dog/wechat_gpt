@@ -100,23 +100,12 @@ class clt():
         # 构造消息
         add_content_to_id(user, [message])
         contents = get_contents_by_id(user)
-        # 获取构造后的消息,最多7条
-        if len(contents) > 7:
-            prompt = {'role': 'user', 'content': '请概述我们之前的所有对话内容。并控制在500字以内。'}
-            contents[-1] = prompt
-            reply = self.summary(contents)
-            reply_message = {"role": "assistant", "content": reply}
-            self.clean_usermsg(user)
-            add_content_to_id(user, [prompt,reply_message, message])
-            
         return contents,model
     
     # 把回复消息存入缓存
     def deal_msg2(self, user, msg):
-        reply_message = {"role": "assistant", "content": msg}
-        add_content_to_id(user, [reply_message])
+        add_content_to_id(user, msg)
  
-
     # 发送文本消息
     def send_text(self,user,msg,model):
         token = get_access_token()
@@ -131,6 +120,21 @@ class clt():
             reply = "您没有权限使用该模型，请联系管理员。"
         else:
             # 调用模型回复
+            # 判断是否需要总结
+            if len(msg) > 7:
+                prompt = {'role': 'user', 'content': '请概述我们之前的所有对话内容。并控制在500字以内。'}
+                # 把用户消息先提出来
+                user_msg = msg[-1]
+                # 替换为总结提示
+                msg[-1] = prompt
+                reply_s = self.summary(msg)
+                # 获取总结回复
+                reply_message = {"role": "assistant", "content": reply_s}
+                self.clean_usermsg(user)
+                # 构造用户消息
+                msg = [prompt,reply_message, user_msg]
+                # 把用户消息存入缓存
+                self.deal_msg2(user,msg)
             reply=self.chat_msg.chat_gpt(msg,model)
         
         # 如果回复长度超过 500 字符，分批发送
@@ -139,7 +143,9 @@ class clt():
             self.news.send_text(user, reply[start:start + 500],token)
             time.sleep(5)
         # 发送完成
-        self.deal_msg2(user,reply[:500])
+        rep={"role": "assistant", "content": reply[:500]}
+        # 把回复消息存入缓存
+        self.deal_msg2(user,[rep])
         self.news.kefu_status(user,'CancelTyping',token)
 
     # 清除用户记忆消息

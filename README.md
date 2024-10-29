@@ -28,15 +28,13 @@
 ### 2-2、docker compose 部署
 ```
 git clone https://github.com/CatAnd-Dog/wechat_gpt.git   
-
 cd  wechat_gpt
+cp .env.example .env
+docker compose pull && docker compose up -d
 ```
 
-**然后自行修改docker compose环境变量的值**   
-或者也可以新建env文件，在env指定环境变量
-```
-docker compose up -d
-```
+**自行修改docker compose环境变量的值**   
+
 此种方式的url=http://ip:34568
 
 ### 3、将你的url+/wechat路径和token填入下面【**接口配置信息**】，并提交
@@ -94,9 +92,13 @@ ps：访问你的url，会返回 **{"code":200,"data":"success"}** 则部署成�
 
 ## ChatGPT对话
 
-有两种方式
+记忆：默认记忆最后一次10分钟内消息，循环刷新记忆时间
 
-1、直接发送问题。。（默认模型gpt-3.5-turbo）  比如： 你会干什么？
+7条消息记忆。发送【清除】可以重置所有记忆
+
+### 有两种方式
+
+1、直接发送问题。。（默认模型gpt-4o-mini）  比如： 你会干什么？
 
 2、 model+空格+问题。。（自己指定模型） 比如： gpt-4 你会干什么？
 

@@ -1,21 +1,22 @@
 import hashlib
-import re
-import html
 import time
 from xml.etree import ElementTree
-from flask import Flask, request, make_response, jsonify,render_template_string
+from flask import Flask, request, make_response, jsonify,render_template
 import threading
 import wechat as ult
 from flask_cors import CORS
+from wechat import config   # 从wechat文件夹中导入config.py文件
+from wechat import loger
 
 
 app = Flask(__name__)
 CORS(app)
+logger = loger.setup_logger(__name__)
 
 clt=ult.clt()
 dbdata_clt=ult.dbdata_clt()
-wx_token = ult.wx_token
-default_reply = ult.default_reply
+wx_token = config.wx_token
+default_reply = config.default_reply
 
 
 @app.route('/', methods=['GET'])
@@ -41,20 +42,25 @@ def wechat():
         msg = parse_message(xml_data)
         user = msg["FromUserName"]
         msg_type = msg["MsgType"]
-        
         # 这个是菜单点击事件的处理。
         if msg_type == "event" and msg["Event"] == "CLICK":
             if msg["EventKey"] == "yourID":
                 return make_response(build_text_response(msg, user))
             return make_response(build_text_response(msg, "天王盖地虎"))
-        
         # 这是处理用户发送的文本消息的代码。
         if msg_type == "text" :
             cont=msg["Content"]
-            thread = threading.Thread(target=clt.send_text, args=(user, cont))
-            thread.start()
-            return make_response(build_text_response(msg, default_reply))
+            if cont=="清除":
+                clt.clean_usermsg(user)
+                return make_response(build_text_response(msg, "记忆清除成功"))
+            else:
+                message,model=clt.deal_msg(user,cont)
+                thread = threading.Thread(target=clt.send_text, args=(user, message, model))
+                thread.start()
+                clt.deal_msg2(user,'好的，我记住了。')
+                return make_response(build_text_response(msg, default_reply))
         return jsonify({'code': 200, 'data': 'success'})
+
 
 
 # 这是模板消息接口
@@ -67,20 +73,13 @@ def sendmuban():
     pageurl=int(time.time())
     urlser=urlred+'/mbpage/'+str(pageurl)
     content = data['content']
-    # 写入数据库
-    values = [info['value'] for key, info in content.items()]
-    result = "<br>".join(values)
-    res1=dbdata_clt.insert_data([str(result),pageurl])
     # 发送模板消息
-    # 遍历所有的 key 并更新 value
-    # 使用字典的副本进行遍历
-    for key in list(content.keys()):
-        content[key]["value"] = strip_html_tags(content[key]["value"])
-
-    print(content)
     res = clt.send_muban(template_id, user, urlser, content)
-    print(res1)
+    # 写入数据库,作为字符串写入
+    content=str(content)
+    dbdata_clt.insert_data([content,pageurl])
     return jsonify({'code': 200, 'data': res})
+
 
 # 这是模板详情页
 @app.route('/mbpage/<id>', methods=['GET'])
@@ -91,7 +90,9 @@ def muban_content(id):
         data=content[1]
     else:
         data="错误，没有内容"
-    return render_template_string(data)
+
+    # 渲染模板--------需要美化(todo)
+    return render_template("muban_content.html", content=data)
 
 
 # 验证服务器地址的有效性
@@ -133,11 +134,6 @@ def build_text_response(msg, content):
     """
     return resp_msg
 
-def strip_html_tags(text):
-    # Unescape HTML entities
-    text = html.unescape(text)
-    # Remove HTML tags using regex
-    return re.sub(r'<.*?>', '', text)
 
 
 if __name__ == '__main__':

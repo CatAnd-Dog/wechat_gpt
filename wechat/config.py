@@ -20,7 +20,7 @@ chat_apikey=os.getenv('APIKEY',"")
 # 默认模型和回复
 default_model=os.getenv('DEF_MODEL',"gpt-4o-mini")
 default_reply=os.getenv('DEFAULT_REPLY',"正在获取回复内容，请耐心等待，请勿重复发送。")
-
+adminid=os.getenv('ADMIN_ID',"")
 
 # 数据库配置
 db_host=os.getenv('DB_HOST',"")
@@ -31,8 +31,11 @@ db_host=os.getenv('DB_HOST',"")
 with open('config.json', 'r') as f:
     config_else = json.load(f)
 
-
+# 标签权限
 Tags=config_else['Tags']
+# 聊天控制
+ChatMsg=config_else['ChatMsg']
+
 
 logger.info("wx_token: %s",wx_token)
 logger.info("appid: %s",appid)
@@ -41,8 +44,10 @@ logger.info("chat_url: %s",chat_url)
 logger.info("chat_apikey: %s",chat_apikey)
 logger.info("default_model: %s",default_model)
 logger.info("default_reply: %s",default_reply)
-logger.info("db_host: %s",db_host)
+logger.info("db_host: %s",adminid)
+logger.info("admin: %s",db_host)
 logger.info("权限标签: %s",Tags)
+logger.info("聊天控制: %s",ChatMsg)
 
 
 def get_token():
@@ -52,11 +57,12 @@ def get_token():
         "appid":appid,
         "secret":appsecret
     }
+    req=requests.post(url,json=data)
     try:
-        req=requests.post(url,json=data)
         token=req.json()['access_token']
         logger.info("token: %s",token)
         return token
     except Exception as e:
+        logger.error("token返回信息: %s",req.text)
         logger.error("获取token失败: %s",str(e))
         return ""

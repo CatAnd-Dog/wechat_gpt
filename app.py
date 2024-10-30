@@ -7,7 +7,7 @@ import wechat as ult
 from flask_cors import CORS
 from wechat import config   # 从wechat文件夹中导入config.py文件
 from wechat import loger
-
+import re
 
 app = Flask(__name__)
 CORS(app)
@@ -53,6 +53,23 @@ def wechat():
             if cont=="清除":
                 clt.clean_usermsg(user)
                 return make_response(build_text_response(msg, "记忆清除成功"))
+            elif cont=="我的id" or cont=="我的ID":
+                return make_response(build_text_response(msg, user))
+            elif cont.startswith("管理") and clt.is_admin(user):  # 管理员命令--可以自行添加修改
+                command = cont[2:].strip()
+                # 添加标签  匹配 管理 + 添加标签 + 用户id + 标签，忽略空格
+                if command.startswith("添加标签"):
+                    userid= command[4:].strip()[:28].strip()
+                    tag=command[4:].strip()[28:].strip()
+                    req=clt.add_tag(userid,tag)
+                    return make_response(build_text_response(msg, req))
+                elif command.startswith("删除标签"):
+                    userid= command[4:].strip()[:28].strip()
+                    tag=command[4:].strip()[28:].strip()
+                    req=clt.delete_tag(userid,tag)
+                    return make_response(build_text_response(msg, req))
+                else:
+                    return make_response(build_text_response(msg, "无效命令"))
             else:
                 message,model=clt.deal_msg(user,cont)
                 thread = threading.Thread(target=clt.send_text, args=(user, message, model))

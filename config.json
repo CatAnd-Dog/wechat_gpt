@@ -20,6 +20,11 @@
         "muban": [
             "muban"
         ]
+    },
+"ChatMsg":{
+    "max_msg": 9,
+    "error_reply": "对不起，对话返回错误，请联系作者",
+    "auth_reply": "对不起，您没有权限访问"
     }
-
 }
+

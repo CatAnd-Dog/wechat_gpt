@@ -69,6 +69,8 @@ class clt():
         self.chat_msg = news.chat_msg()
         # 初始化标签---用于权限控制
         self.auth_list = self.init_tag()
+        # 初始化管理员
+        self.init_admin()
  
     # 初始化标签
     def init_tag(self):
@@ -81,15 +83,24 @@ class clt():
             # 如果标签不存在则创建
             if tag not in taglist_dic:
                 req=self.func.creattag(tag, token)
+                logger.info("标签不存在，已创建: %s",req)
                 auth_list[req['tag']['id']]=config.Tags.get(tag)
             else:
+                logger.info("标签存在: %s",tag)
                 auth_list[taglist_dic.get(tag)]=config.Tags.get(tag)
         return auth_list
    
+    # 初始化管理员
+    def init_admin(self):
+        if config.adminid:
+            self.add_tag(config.adminid,'admin')
+            logger.info("设置管理员{}.成功".format(config.adminid))
+        else:
+            logger.info("没有设置管理员")
+        
 
     # 把用户消息存入缓存
     def deal_msg(self, user, msg):
-        logger.debug("用户消息: %s",msg)
         parts  = msg.split(' ', 1)
         if parts[0] in []:  # 如果消息以模型名称开头,则使用该模型回复
             message= {'role': 'user', 'content': parts[1]}
@@ -99,7 +110,8 @@ class clt():
             model=default_model
         # 构造消息
         add_content_to_id(user, [message])
-        contents = get_contents_by_id(user)[-7:]
+        # 获取用户最近的消息,最多取 n 条
+        contents = get_contents_by_id(user)[(-1)*config.ChatMsg['max_msg']:]
         return contents,model
     
     # 把回复消息存入缓存
@@ -117,11 +129,10 @@ class clt():
         auth= sum(auth, [])
         # 判断用户权限
         if model not in auth:
-            reply = "您没有权限使用该模型，请联系管理员。"
+            reply = config.ChatMsg['auth_reply']
         else:
             # 调用模型回复
             # 判断是否需要总结
-            logger.debug("用户消息数组: %s",msg)
             # if len(msg) > 8:
             #     prompt = {'role': 'user', 'content': '请概述我们之前的所有对话内容，以此作为我们接下来对话的提示.'}
             #     # 把用户消息先提出来
@@ -137,14 +148,15 @@ class clt():
             #     msg = [reply_message, user_msg]
             #     # 把用户消息存入缓存
             #     self.deal_msg2(user,msg)
-            
+            logger.debug("用户消息数组: %s",msg)
             reply=self.chat_msg.chat_gpt(msg,model)
         
         # 如果回复长度超过 500 字符，分批发送
         for start in range(0, len(reply), 500):
             # 截取从 start 到 start+500 的字符，发送
             self.news.send_text(user, reply[start:start + 500],token)
-            time.sleep(5)
+            time.sleep(1)
+        logger.debug("聊天返回消息: %s",reply)
         # 发送完成
         rep={"role": "assistant", "content": reply[:500]}
         # 把回复消息存入缓存
@@ -153,9 +165,10 @@ class clt():
 
     # 清除用户记忆消息
     def clean_usermsg(self,user):
+        logger.debug("记忆清除成功")
         id_content_cache.pop(user, None)
 
-    # 总结聊天记录，防止消息过多
+    # 总结聊天记录，防止消息过多----有bug，暂时不用
     def summary(self,prompt):
         reply=self.chat_msg.chat_gpt(prompt,default_model)
         return reply
@@ -168,6 +181,7 @@ class clt():
         auth = [self.auth_list.get(tag) for tag in usertag]
         auth= sum(auth, [])
         if 'muban' not in auth:
+            logger.info("用户没有权限使用模板消息: %s",user)
             return 'erro'
         self.muban.sendmuban(template_id, user, urlred, content,token)
         logger.debug("template_id: %s, user: %s, urlred: %s, content: %s",template_id, user, urlred, content)
@@ -183,8 +197,38 @@ class clt():
         if 'admin' in auth:
             return True
         else:
+            logger.debug("你不是管理员，无法使用: %s",user)
             return False
 
+    def add_tag(self,userid,tag_name):
+        token = get_access_token()
+        # 先获取tag对应的id
+        taglist = self.func.gettag(token)['tags']
+        taglist_dic= {tag['name']: tag['id'] for tag in taglist}
+        tagid=taglist_dic.get(tag_name)
+        # 添加标签
+        req=self.func.adduser(userid,tagid,token)
+        logger.info("添加标签返回: %s",req)
+        if req['errcode']==0:
+            return "添加{}成功{}".format(userid,tag_name)
+        else:
+            return "添加{}失败{}".format(userid,tag_name)
+        
+    def delete_tag(self,userid,tag_name):
+        token = get_access_token()
+        # 先获取tag对应的id
+        taglist = self.func.gettag(token)['tags']
+        taglist_dic= {tag['name']: tag['id'] for tag in taglist}
+        tagid=taglist_dic.get(tag_name)
+        # 删除标签
+        req=self.func.deleteuser(userid,tagid,token)
+        logger.info("删除标签返回: %s",req)
+        if req['errcode']==0:
+            return "删除{}成功{}".format(userid,tag_name)
+        else:
+            return "删除{}失败{}".format(userid,tag_name)
+
+    
 # 数据库操作类
 class dbdata_clt():
     def __init__(self) :

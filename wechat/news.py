@@ -68,12 +68,12 @@ class chat_msg:
             'stream': False,
         }
         req=requests.post(url,headers=headers,json=data,timeout=120)
-        logger.debug("gpt请求返回: %s",req.text)
         try:
             rep=req.json()['choices'][0]['message']['content']
         except Exception as e:
+            logger.debug("gpt请求返回: %s",req.text)
             logger.error("gpt请求失败: %s",str(e))
-            rep='请求失败'
+            rep=config.ChatMsg['error_reply']
         return rep
 
 

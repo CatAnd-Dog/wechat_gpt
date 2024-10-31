@@ -1,3 +1,6 @@
 .env
 test.py
+wechat/__pycache__/
+.vscode/
 *.pyc
+*.ipynb

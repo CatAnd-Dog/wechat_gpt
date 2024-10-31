@@ -24,7 +24,7 @@ adminid=os.getenv('ADMIN_ID',"")
 
 # 数据库配置
 db_host=os.getenv('DB_HOST',"")
-
+notify_url=os.getenv('NOTIFY_URL',"")
 
 
 # 读取confif.json文件
@@ -48,6 +48,7 @@ logger.info("db_host: %s",adminid)
 logger.info("admin: %s",db_host)
 logger.info("权限标签: %s",Tags)
 logger.info("聊天控制: %s",ChatMsg)
+logger.info("notify_url: %s",notify_url)
 
 
 def get_token():
@@ -66,3 +67,12 @@ def get_token():
         logger.error("token返回信息: %s",req.text)
         logger.error("获取token失败: %s",str(e))
         return ""
+    
+
+# 添加错误验证提示
+def display_error(req):
+    if 'errcode' not in req or req['errcode']==0:
+        return req
+    else:
+        logger.error("发生严重错误：{}".format(req))
+        return req

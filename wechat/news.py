@@ -15,6 +15,8 @@ headers = {
 
 # 客服消息
 class kefu:
+    def __init__(self):
+        self.display_error=config.display_error
 
     # 发送客服状态
     def kefu_status(self,user,status,token):
@@ -22,6 +24,7 @@ class kefu:
         data= { "touser":user, "command":status}
         data=json.dumps(data, ensure_ascii=False).encode('utf8')
         res = requests.post(url=url, data=data, headers=headers)
+        res=self.display_error(res)
         return res.json()
 
     # 发送文本消息
@@ -34,6 +37,7 @@ class kefu:
                 }
         data=json.dumps(data, ensure_ascii=False).encode('utf8')
         res = requests.post(url=url, data=data, headers=headers)
+        res=self.display_error(res)
         return res.json()
 
 
@@ -49,6 +53,7 @@ class  muban:
             "data":content
                 }
         res = requests.post(url=url, json=data, headers=headers)
+        res=self.display_error(res)
         return res.json()
 
 

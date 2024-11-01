@@ -1,10 +1,10 @@
 name: Docker Image CI
 
 on:
-  push:
-      branches:
-        - main
-        - opaoplus
+  # push:
+  #     branches:
+  #       - main
+  #       - opaoplus
   workflow_dispatch:
 
 jobs:

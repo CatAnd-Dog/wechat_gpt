@@ -37,20 +37,6 @@ class kefu:
         return res.json()
 
 
-# 模板消息
-class  muban:
-    # 发送模板消息
-    def sendmuban(self, template_id,user, urlred,content,token):
-        url = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token={}".format(token)
-        data = {
-            "touser": user,
-            "template_id": template_id,
-            'url':urlred,
-            "data":content
-                }
-        res = requests.post(url=url, json=data, headers=headers)
-        return res.json()
-
 
 # 聊天功能---调用gpt模型
 class chat_msg:
@@ -68,13 +54,12 @@ class chat_msg:
             'stream': False,
         }
         req=requests.post(url,headers=headers,json=data,timeout=120)
-        logger.debug("gpt请求返回: %s",req.text)
         try:
             rep=req.json()['choices'][0]['message']['content']
+            return rep
         except Exception as e:
             logger.error("gpt请求失败: %s",str(e))
-            rep='请求失败'
-        return rep
+            return config.error_reply
 
 
 

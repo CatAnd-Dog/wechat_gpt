@@ -12,9 +12,7 @@ from wechat import loger
 app = Flask(__name__)
 CORS(app)
 logger = loger.setup_logger(__name__)
-
 clt=ult.clt()
-dbdata_clt=ult.dbdata_clt()
 wx_token = config.wx_token
 default_reply = config.default_reply
 
@@ -57,42 +55,9 @@ def wechat():
                 message,model=clt.deal_msg(user,cont)
                 thread = threading.Thread(target=clt.send_text, args=(user, message, model))
                 thread.start()
-                clt.deal_msg2(user,'好的，我记住了。')
                 return make_response(build_text_response(msg, default_reply))
         return jsonify({'code': 200, 'data': 'success'})
 
-
-
-# 这是模板消息接口
-@app.route('/muban', methods=['POST'])
-def sendmuban():
-    data = request.get_json()
-    template_id = data['template_id']
-    user = data['user']
-    urlred = data['urlred']
-    pageurl=int(time.time())
-    urlser=urlred+'/mbpage/'+str(pageurl)
-    content = data['content']
-    # 发送模板消息
-    res = clt.send_muban(template_id, user, urlser, content)
-    # 写入数据库,作为字符串写入
-    content=str(content)
-    dbdata_clt.insert_data([content,pageurl])
-    return jsonify({'code': 200, 'data': res})
-
-
-# 这是模板详情页
-@app.route('/mbpage/<id>', methods=['GET'])
-def muban_content(id):
-    # 查询数据库
-    content=dbdata_clt.get_data([int(id)])
-    if content:
-        data=content[1]
-    else:
-        data="错误，没有内容"
-
-    # 渲染模板--------需要美化(todo)
-    return render_template("muban_content.html", content=data)
 
 
 # 验证服务器地址的有效性

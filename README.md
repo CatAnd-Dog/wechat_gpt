@@ -17,6 +17,7 @@ opaoqiwei--企业微信版本
 
 ### 提供免费的api
 CHAT_URL=https://momo.opao.xyz/v1/chat/completions
+
 APIKEY=sk-F3qfuHj61oET8K9advLSJ8NAP9YDHPOV1vdfn5GDR5sNJwwl
 
 ### 1、获取变量

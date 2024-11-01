@@ -1,4 +1,0 @@
-services:
-  - name: flask-app  # 您的服务名称，可以自定义
-    port: 34568       # Zeabur 运行的默认端口
-    run: "python app.py"  # 项目启动命令，如果使用 gunicorn，可以替换为 `gunicorn -w 4 -b 0.0.0.0:3000 app:app`

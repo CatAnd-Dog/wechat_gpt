@@ -4,10 +4,21 @@
 <br/>
 
 * 微信公众号实现ChatGPT的对话功能   
-* 微信公众号实现消息推送功能   
-* 微信公众号用户权限管理【todo】
+* 开箱即用
+* 自定义模型
+
+
+opaoplus--带权限管理和模板消息
+
+opaoqiwei--企业微信版本
+
 
 ## 部署方法
+
+### 提供免费的api
+CHAT_URL=https://momo.opao.xyz/v1/chat/completions
+APIKEY=sk-F3qfuHj61oET8K9advLSJ8NAP9YDHPOV1vdfn5GDR5sNJwwl
+
 ### 1、获取变量
 登录微信公众号的后台---建议使用[**测试号**](https://mp.weixin.qq.com/debug/cgi-bin/sandbox?t=sandbox/login), 获取**appID**和**appsecret**  
 
@@ -15,10 +26,14 @@
 
 
 
-### 2-1、Zeabur一键部署  
-[![Deploy on Zeabur](https://zeabur.com/button.svg)](https://zeabur.com/templates/68MAH3?referralCode=CatAnd-Dog)
+
+
+
+### 2-1、Vercel一键部署---推荐
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FCatAnd-Dog%2Fwechat_gpt&env=WX_TOKEN,APPID,APPSECRET,CHAT_URL,APIKEY)
 
 **根据要求填写环境变量**
+
 
 其中token是自己定义的值。需要记下。
 
@@ -35,6 +50,15 @@ docker compose pull && docker compose up -d
 
 此种方式的url=http://ip:34568
 
+
+
+### 2-3、Zeabur一键部署  ---- 失效了，不知道什么bug
+[![Deploy on Zeabur](https://zeabur.com/button.svg)](https://zeabur.com/templates/68MAH3?referralCode=CatAnd-Dog)
+
+**根据要求填写环境变量**
+
+
+
 ### 3、将你的url+/wechat路径和token填入下面【**接口配置信息**】，并提交
 
 <img src="./img/wechat1.jpg" width="500">
@@ -45,54 +69,14 @@ docker compose pull && docker compose up -d
 ps：访问你的url，会返回 **{"code":200,"data":"success"}** 则部署成功
 
 
-## 消息推送，哪吒探针
-
-访问公众号后台，记下用户列表对应的**微信号**
-
-按照如下方式新增模板，并填写内容。记下**模板ID**
-
-```
-内容：{{content.DATA}} 服务器名：{{ServerName.DATA}} IP：{{ServerIP.DATA}}
-```
-
-<img src="./img/wechat2.jpg" width="800">   
-
-<img src="./img/wechat3.jpg" width="500">
-
-访问你的探针后台，告警--新增通知方式--按照如下方式填写
-
-```
-{
-"template_id":"模板ID",
-    "user":"微信号",
-    "urlred":"跳转页，可不填或者填你的探针地址",
-    "content":{
-    "thing20": {
-        "value": "#NEZHA#"
-    },
-    "thing13": {
-        "value": "#SERVER.NAME#"
-    },
-    "thing26": {
-        "value": "#SERVER.IP#"
-    }
-}
-}
-```
-
-<img src="./img/tanzhen1.jpg" width="500">
-
-<img src="./img/tanzhen2.jpg" width="500">
-
-
-最后新增[**告警规则**](https://nezha.wiki/guide/notifications.html)即可
-
 
 ## ChatGPT对话
 
 记忆：默认记忆最后一次10分钟内消息，循环刷新记忆时间
 
 7条消息记忆。发送【清除】可以重置所有记忆
+
+更多环境变量，请查看.env.example
 
 ### 有两种方式
 

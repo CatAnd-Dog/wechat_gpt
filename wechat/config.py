@@ -21,7 +21,7 @@ chat_apikey=os.getenv('APIKEY',"")
 # 默认模型和回复
 all_model=os.getenv('ALL_MODEL',"gpt-4o-mini")
 all_model_list=all_model.split(",")
-default_reply=os.getenv('DEFAULT_REPLY',"正在获取回复内容，请耐心等待，请勿重复发送。")
+default_reply=os.getenv('DEFAULT_REPLY',"")
 error_reply=os.getenv('ERROR_REPLY',"获取回复内容失败，请稍后再试。")
 max_num=int(os.getenv('MAX_NUM',7))
 
